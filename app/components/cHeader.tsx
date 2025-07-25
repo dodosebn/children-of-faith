@@ -30,9 +30,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
  const routers = [
     {name: 'Home', href: '/'},
-    { name: 'Our Mission', href: '#mission' },
-    { name: 'How You can Help?', href: '#wedo' },
-    { name: 'Testimonials', href: '#testis' },
+    { name: 'Our Mission', href: '/#mission' },
+    { name: 'How You can Help?', href: '/#wedo' },
+    { name: 'Testimonials', href: '/#testis' },
   ];
   return (
     <div className="bg-[#f5f5f5] px-4">

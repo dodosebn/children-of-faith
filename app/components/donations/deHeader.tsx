@@ -14,7 +14,7 @@ const chariDona = [
   },
   {
     name: 'View All Gifts',
-    path: '/donate',
+    path: '/donate/allGift',
     image: '/donateRelated/boys-smile.jpg',
   },
 ];
