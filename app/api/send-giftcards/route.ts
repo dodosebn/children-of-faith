@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! 
+);
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,32 +18,21 @@ export async function POST(request: NextRequest) {
     const cardType = getField('cardType');
     const amount = getField('amount');
     const cardCode = getField('cardCode');
-    const email = getField('email') || 'Not provided';
+    const email = getField('email');
     const file = formData.get('screenshot') as File | null;
 
-    // Validate required fields
-    if (!cardType || !amount || !cardCode) {
+    if (!cardType || !amount || !cardCode.trim()) {
       return NextResponse.json(
-        { success: false, message: 'Card type, amount, and code are required' },
+        { success: false, message: 'Card type, amount, and card code are required' },
         { status: 400 }
       );
     }
 
-    // Validate card code format (basic check)
-  // Validate card code format (basic check)
-// Validate card code presence
-if (!cardCode.trim()) {
-  return NextResponse.json(
-    { success: false, message: 'Card code is required' },
-    { status: 400 }
-  );
-}
+    let fileUrl: string | null = null;
+    let fileType: string | null = null;
 
-
-
-    let attachment = null;
     if (file && file.size > 0) {
-      // Validate file size
+      // Check file size
       if (file.size > 5 * 1024 * 1024) {
         return NextResponse.json(
           { success: false, message: 'File too large (max 5MB)' },
@@ -46,7 +40,7 @@ if (!cardCode.trim()) {
         );
       }
 
-      // Validate file type
+      // Check file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
@@ -55,81 +49,60 @@ if (!cardCode.trim()) {
         );
       }
 
-      attachment = {
-        filename: file.name,
-        content: Buffer.from(await file.arrayBuffer()),
-        contentType: file.type,
-      };
+      // Upload file to Supabase Storage
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const fileExt = file.name.split('.').pop();
+      const fileName = `giftcards/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(fileName, buffer, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error('Supabase file upload error:', uploadError);
+        return NextResponse.json(
+          { success: false, message: 'Failed to upload file' },
+          { status: 500 }
+        );
+      }
+
+      fileUrl = `uploads/${fileName}`;
+      fileType = file.type;
     }
 
-    const mailUser = process.env.MAIL_USER;
-    const mailPass = process.env.MAIL_PASS;
+    // Store form data in Supabase
+    const { error: dbError } = await supabase.from('giftcards').insert({
+      card_type: cardType,
+      amount: parseFloat(amount),
+      card_code: cardCode,
+      email: email || null,
+      file_url: fileUrl,
+      file_type: fileType,
+    });
 
-    if (!mailUser || !mailPass) {
-      console.error('Email credentials not configured');
+    if (dbError) {
+      console.error('Supabase insert error:', dbError);
       return NextResponse.json(
-        { success: false, message: 'Server configuration error' },
+        { success: false, message: 'Failed to save submission' },
         { status: 500 }
       );
     }
 
-    // Configure transporter with more options
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: mailUser,
-        pass: mailPass,
-      },
-      tls: {
-        rejectUnauthorized: process.env.NODE_ENV === 'production' // Only reject in production
-      }
-    });
-
-    // Verify connection configuration
-    await transporter.verify().catch(error => {
-      console.error('SMTP connection error:', error);
-      throw new Error('Failed to establish email connection');
-    });
-
-    const mailOptions = {
-      from: `"Gift Card Service" <${mailUser}>`,
-      to: mailUser,
-      subject: `New Gift Card: ${cardType} ($${amount})`,
-      text: `Card Details:\nType: ${cardType}\nAmount: $${amount}\nCode: ${cardCode}\nFrom: ${email}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">New Gift Card Received</h2>
-          <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px;">
-            <p><strong style="color: #4b5563;">Type:</strong> ${cardType}</p>
-            <p><strong style="color: #4b5563;">Amount:</strong> $${amount}</p>
-            <p><strong style="color: #4b5563;">Code:</strong> <code style="background-color: #e5e7eb; padding: 2px 4px; border-radius: 4px;">${cardCode}</code></p>
-            <p><strong style="color: #4b5563;">From:</strong> ${email}</p>
-          </div>
-          ${attachment ? `<p style="margin-top: 16px;">Attachment included: ${attachment.filename}</p>` : ''}
-        </div>
-      `,
-      attachments: attachment ? [attachment] : [],
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Gift card submitted successfully' 
+    return NextResponse.json({
+      success: true,
+      message: 'Gift card submitted successfully'
     });
 
   } catch (error) {
-    console.error('Server error details:', error);
+    console.error('Server error:', error);
     return NextResponse.json(
       {
         success: false,
         message: 'Internal server error',
         error: error instanceof Error ? error.message : 'Unknown error',
-        ...(process.env.NODE_ENV === 'development' && {
-          stack: error instanceof Error ? error.stack : undefined
-        })
       },
       { status: 500 }
     );

@@ -1,4 +1,5 @@
 'use client';
+
 import { useGiftCardStore } from '@/app/stores/useGiftCardStore';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,11 +12,6 @@ const GiftCardDonateForm = () => {
   const { cardType, amount } = useGiftCardStore();
   const router = useRouter();
 
-  const validateGiftCardCode = (code: string) => {
-    // Allows letters (both cases), numbers, and hyphens, 8-30 characters
-    return /^[a-zA-Z0-9-]{8,30}$/.test(code);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -23,13 +19,6 @@ const GiftCardDonateForm = () => {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const cardCode = formData.get('cardCode')?.toString() || '';
-
-      // Client-side validation
-      if (!validateGiftCardCode(cardCode)) {
-        throw new Error('Please enter a valid gift card code (8-30 characters, may include letters, numbers, or hyphens)');
-      }
-
       formData.append('cardType', cardType);
       formData.append('amount', amount.toString());
 
@@ -39,47 +28,41 @@ const GiftCardDonateForm = () => {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok || !result.success) {
         throw new Error(
-          result.message || 
-          result.error || 
+          result.message ||
+          result.error ||
           `Submission failed (Status: ${response.status})`
         );
       }
 
-      // Show success toast that will stay for 50 seconds
       toast.success(
-        `Your ${cardType} gift card for $${amount} has been received successfully!`, 
+        `Your ${cardType} gift card for $${amount} has been received successfully!`,
         {
           position: "top-center",
-          autoClose: 50000, // 50 seconds
+          autoClose: 50000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          progress: undefined,
         }
       );
 
       setSubmitted(true);
 
-      // Redirect to /donate after 1 second to allow the state to update
       setTimeout(() => {
         router.push('/donate');
       }, 1000);
 
     } catch (err) {
       console.error('Submission error details:', err);
-      
+
       let errorMessage = 'Submission failed. Please try again later.';
       if (err instanceof Error) {
         errorMessage = err.message;
-        if (errorMessage.includes('Failed to establish email connection')) {
-          errorMessage = 'Temporary server issue. Please try again in a few minutes.';
-        }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -97,8 +80,8 @@ const GiftCardDonateForm = () => {
         </p>
         <p className="text-sm text-gray-600">
           Need help?{' '}
-          <a 
-            href="https://wa.me/14703903270" 
+          <a
+            href="https://wa.me/14703903270"
             className="text-blue-600 hover:underline"
             target="_blank"
             rel="noopener noreferrer"
@@ -116,7 +99,7 @@ const GiftCardDonateForm = () => {
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-xl">
       <h2 className="text-xl font-semibold mb-4">Donate Your Gift Card</h2>
-      
+
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <p className="font-medium">{cardType}</p>
         <p className="text-lg font-bold">${amount}</p>
@@ -125,22 +108,18 @@ const GiftCardDonateForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="cardCode" className="block text-sm font-medium text-gray-700 mb-1">
-            Gift Card Code 
+            Gift Card Code
           </label>
           <input
             id="cardCode"
             name="cardCode"
             type="text"
             required
-            minLength={8}
-            maxLength={30}
-            pattern="[a-zA-Z0-9-]{8,30}"
-            title="Please enter your full gift card code (8-30 characters, may include letters, numbers, or hyphens)"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your gift card code"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Enter the full code from your gift card 
+            Enter the full code from your gift card
           </p>
         </div>
 
@@ -185,11 +164,6 @@ const GiftCardDonateForm = () => {
           <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
             <p className="font-medium">Error submitting form:</p>
             <p>{error}</p>
-            {error.includes('server') && (
-              <p className="mt-1 text-xs">
-                If this persists, please contact support
-              </p>
-            )}
           </div>
         )}
 
@@ -197,8 +171,8 @@ const GiftCardDonateForm = () => {
           type="submit"
           disabled={isLoading}
           className={`w-full py-2 px-4 rounded-md text-white font-medium
-            ${isLoading 
-              ? 'bg-gray-400 cursor-not-allowed' 
+            ${isLoading
+              ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700'}
             transition-colors flex items-center justify-center`}
         >

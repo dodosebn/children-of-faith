@@ -43,7 +43,7 @@ const GiftsPage = () => {
             className="block w-48 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
           >
             <option value="">All Prices</option>
-            <option value="$0 - $90">$0 - $90</option>
+            {/* <option value="$0 - $90">$0 - $90</option> */}
             <option value="$100 - $900">$100 - $900</option>
             <option value="$1000+">$1000+</option>
           </select>
