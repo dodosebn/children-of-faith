@@ -25,12 +25,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate card code format (basic check)
-    if (!/^[a-zA-Z0-9]{4,}-?[a-zA-Z0-9]{4,}-?[a-zA-Z0-9]{4,}-?[a-zA-Z0-9]{4,}$/.test(cardCode)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid gift card code format' },
-        { status: 400 }
-      );
-    }
+  // Validate card code format (basic check)
+// Validate card code presence
+if (!cardCode.trim()) {
+  return NextResponse.json(
+    { success: false, message: 'Card code is required' },
+    { status: 400 }
+  );
+}
+
+
 
     let attachment = null;
     if (file && file.size > 0) {
