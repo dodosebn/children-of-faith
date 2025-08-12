@@ -2,15 +2,18 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 const USERNAME = 'admin'
-const PASSWORD = 'password123'
+const PASSWORD = 'secret_p_s_word'
 
 const LoginPage = () => {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isAdmin')
@@ -21,52 +24,74 @@ const LoginPage = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
 
-    if (username === USERNAME && password === PASSWORD) {
-      localStorage.setItem('isAdmin', 'true')
-      router.push('/admin/giftcards')
-    } else {
-      setError('Invalid username or password')
-    }
+    setTimeout(() => {
+      if (username === USERNAME && password === PASSWORD) {
+        localStorage.setItem('isAdmin', 'true')
+        router.push('/admin/giftcards')
+      } else {
+        setError('Invalid username or password')
+        setLoading(false)
+      }
+    }, 800) // small delay for UX feel
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <form
         onSubmit={handleLogin}
-        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
+        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm transform transition-all hover:shadow-xl"
       >
-        <h2 className="text-xl font-semibold mb-4 text-center">Admin Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
 
+        {/* Username Field */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Username</label>
           <input
             type="text"
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
 
-        <div className="mb-4">
+        {/* Password Field with Eye Icon */}
+        <div className="mb-4 relative">
           <label className="block text-sm font-medium mb-1">Password</label>
           <input
-            type="password"
-            className="w-full border px-3 py-2 rounded"
+            type={showPassword ? 'text' : 'password'}
+            className="w-full border px-3 py-2 rounded pr-10 focus:ring-2 focus:ring-blue-500 outline-none transition"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <button
+            type="button"
+            className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Toggle password visibility"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
         </div>
 
-        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+        {/* Error Message */}
+        {error && (
+          <p className="text-red-600 text-sm mb-4 animate-pulse">{error}</p>
+        )}
 
+        {/* Login Button */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
+          disabled={loading}
+          className={`w-full ${
+            loading ? 'bg-gray-500' : 'bg-black hover:bg-gray-800'
+          } text-white py-2 rounded transition`}
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>

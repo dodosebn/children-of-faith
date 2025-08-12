@@ -4,6 +4,10 @@ import gift3 from '@/public/donateRelated/bussiness-skills.jpg';
 import gift4 from '@/public/donateRelated/computers.jpg';
 import gift5 from '@/public/donateRelated/english-skill.jpg';
 import gift6 from '@/public/donateRelated/help-bys.jpg';
+import gift7 from '@/public/donateRelated/lifesaving-surgery.jpg';
+import gift8 from '@/public/donateRelated/home-repair.jpg';
+import gift9 from '@/public/donateRelated/send-kid-to-coll.jpg';
+import gift10 from '@/public/donateRelated/arts-bundle.jpg';
 export const allGifts = [
   {
     id: 1,
@@ -101,4 +105,78 @@ export const allGifts = [
       </div>
     `,
   },
+     {
+    id: 7,
+    img: gift7,
+    heading: "Lifesaving Surgery",
+    outerPrice: "$10,000",
+    innerOuterMes: "Suggested Gift",
+    InnerMessage: `
+     <div>
+        <p class="font-semibold">
+        By providing funds for surgery, you will give a family praying for a miracle the gift of hope. Your gift will cover travel for children needing hospitalization as well as surgery, medication and rehabilitative care.
+
+</p>
+        <p class="mt-2">Even with health insurance in the United States, the costs of surgery can be crippling. For children in Compassion’s programs, surgery equals years of wages for already struggling families. For these children, Compassion provides funding for:
+</p>
+        <ul class="list-disc pl-5 mt-2 space-y-1">
+          <li>Travel to well-equipped hospitals</li>
+          <li>Surgery </li>
+          <li>Rehabilitative care</li>
+              <li>Medication</li>
+        </ul>
+      </div>
+    `,
+  },
+      {
+    id: 8,
+    img: gift8,
+    heading: "Home Repair",
+    outerPrice: "$2,400",
+    innerOuterMes: "Suggested Gift",
+    InnerMessage: `
+     <div>
+        <p class="font-semibold">
+Homes in impoverished communities are especially susceptible to destruction from natural disasters. Without resources to rebuild, children and their families are often left homeless or left having to spending their money for food on repairs. Offer a family immediate relief and hope for the future by helping rebuild a home.
+
+
+</p>
+        <p class="mt-2">Your gift will help rebuild homes and lives. You’ll also build their faith in God’s goodness and deliverance. This gift helps provide stability and support so children can reach their potential.
+</p>
+        <ul class="list-disc pl-5 mt-2 space-y-1">
+          <li>Providing food, hygiene kits and temporary shelter.</li>
+          <li>Rebuilding homes, schools and development centers. </li>
+          <li>Providing stability and support so children can reach their potential.</li>
+        </ul>
+      </div>
+    `,
+  },
+        {
+    id: 9,
+    img: gift9,
+    heading: "Send a Compassion Kid, to College",
+    outerPrice: "$2,500",
+    innerOuterMes: "Suggested Gift",
+    InnerMessage: `
+     <div>
+        <p class="font-semibold">
+
+
+
+Compassion assisted children often have the potential but not the resources to take the next step to post-secondary education. 
+Your gift will help equip a child to receive an education while offering the promise and hope of a better future.
+
+</p>
+        <p class="mt-2">Giving the gift of Send a Compassion Kid to College will help cover the costs of:
+
+</p>
+        <ul class="list-disc pl-5 mt-2 space-y-1">
+          <li>Education fees.</li>
+          <li>Pre-university preparatory courses.</li>
+          <li>Lab and test costs.</li>
+        </ul>
+      </div>
+    `,
+  },
+  
 ];

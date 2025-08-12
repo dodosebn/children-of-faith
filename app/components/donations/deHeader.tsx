@@ -9,7 +9,7 @@ const DeHeader = () => {
 const chariDona = [
   {
     name: 'Gifts by Category',
-    path: '/donate',
+    path: '/donate/allGift',
     image: '/donateRelated/alot-said.jpg',
   },
   {

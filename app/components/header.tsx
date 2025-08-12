@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { CiLocationOn } from 'react-icons/ci';
-import { FaEnvelope } from 'react-icons/fa';
+import { FaAngleRight, FaEnvelope } from 'react-icons/fa';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import type { Variants } from 'framer-motion';
@@ -171,7 +171,19 @@ const Header = () => {
                       </Link>
                     </motion.li>
                   ))}
-
+                  <motion.li variants={itemVariant} className='flex justify-center items-center'>
+                    <Link href="/donate">
+                  <button className="bg-[#B23E3E] gap-4 flex items-center text-[#fff] font-bold px-4 py-3 rounded-sm transition-all duration-300 transform hover:scale-105 group">
+                    <div className="relative h-6 overflow-hidden">
+                      <div className="transition-transform duration-800 ease-in-out group-hover:-translate-y-6">
+                        <span className="block h-6">Donate Now</span>
+                        <span className="block h-6">Sponsor Us</span>
+                      </div>
+                    </div>
+                    <FaAngleRight className="text-lg" />
+                  </button>
+                </Link>
+                </motion.li>
                   {/* Contact Info */}
                   <motion.li className="px-4 grid grid-cols-2 gap-4 mt-4" variants={itemVariant}>
                     <div className="flex items-start space-x-2">
