@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
       fileType = file.type;
     }
 
-    // Store form data in Supabase
     const { error: dbError } = await supabase.from('giftcards').insert({
       card_type: cardType,
       amount: parseFloat(amount),
