@@ -1,10 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! 
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// Reusable email notification function
+async function sendNotificationEmail() {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS, 
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Gift Notifier" <${process.env.ADMIN_EMAIL}>`,
+      to: process.env.MAIL_USER, 
+      subject: 'New Gift Card Received',
+      text: 'Someone just gifted. Please check the dashboard for details.',
+      html: `<p>🎁 Someone just sent a gift card. <strong>Check the dashboard</strong> for details.</p>`,
+    });
+
+    console.log('Notification email sent');
+  } catch (err) {
+    console.error('Email send error:', err);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +58,6 @@ export async function POST(request: NextRequest) {
     let fileType: string | null = null;
 
     if (file && file.size > 0) {
-      // Check file size
       if (file.size > 5 * 1024 * 1024) {
         return NextResponse.json(
           { success: false, message: 'File too large (max 5MB)' },
@@ -40,7 +65,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Check file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
@@ -49,7 +73,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Upload file to Supabase Storage
       const buffer = Buffer.from(await file.arrayBuffer());
       const fileExt = file.name.split('.').pop();
       const fileName = `giftcards/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -90,11 +113,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Send email after saving to DB
+    await sendNotificationEmail();
+
     return NextResponse.json({
       success: true,
-      message: 'Gift card submitted successfully'
+      message: 'Gift card submitted successfully',
     });
-
   } catch (error) {
     console.error('Server error:', error);
     return NextResponse.json(
