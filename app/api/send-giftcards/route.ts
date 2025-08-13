@@ -20,7 +20,7 @@ async function sendNotificationEmail() {
 
     await transporter.sendMail({
       from: `"Gift Notifier" <${process.env.ADMIN_EMAIL}>`,
-      to: process.env.MAIL_USER, 
+      to: process.env.Admin, 
       subject: 'New Gift Card Received',
       text: 'Someone just gifted. Please check the dashboard for details.',
       html: `<p>🎁 Someone just sent a gift card. <strong>Check the dashboard</strong> for details.</p>`,

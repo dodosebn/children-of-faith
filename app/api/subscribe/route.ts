@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     // Email to admin
     await transporter.sendMail({
       from: `"Newsletter Subscription" <${mailUser}>`,
-      to: mailUser,
+      to: process.env.Admin, 
       subject: `New Newsletter Subscriber: ${firstName} ${lastName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
